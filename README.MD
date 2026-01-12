@@ -18,18 +18,18 @@ Az **OpenPit** egy nyílt forráskódú, web-alapú adminisztrációs felület, 
 
 ## 💻 Technológiai Stack
 ### Frontend (előreláthatólag)
-* **React:** 
-* **Tailwind CSS:**
-* **Lucide React:**
-* **Recharts / Chart.js:**
+* **React**
+* **Tailwind CSS**
+* **Lucide React**
+* **Recharts / Chart.js**
 
 ### Backend
-* **Node.js & Express.js:**
-* **Socket.io:**
-* **Dockerode:**
+* **Node.js & Express.js**
+* **Socket.io**
+* **Dockerode**
 
 ### Rendszerintegráció
-* **Linux System Bridge:**
+* **Linux System Bridge**
 
 ---
 
