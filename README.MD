@@ -35,10 +35,7 @@ Az **OpenPit** egy nyílt forráskódú, web-alapú adminisztrációs felület, 
 
 ## 🚀 Telepítés
 
-### Előfeltételek
-* Node.js (v18+)
-* Linux operációs rendszer (Ubuntu, Debian, Fedora stb.)
-* Docker (opcionális, a konténer-kezelő modulhoz)
+**Jelenleg nem elérhető**
 
 ---
 
