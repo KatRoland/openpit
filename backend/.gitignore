@@ -1,19 +1,5 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-
-# Dependency directories
-node_modules/
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# dotenv environment variable files
+node_modules
+# Keep environment variables out of version control
 .env
+
+/src/generated/prisma
