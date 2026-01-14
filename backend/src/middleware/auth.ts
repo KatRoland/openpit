@@ -1,17 +1,34 @@
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../utils/config.js';
 
-export const authorize = (req: any, res: any, next: any) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
+interface UserPayload {
+  id: number;
+  username: string;
+}
 
-  if (!token) return res.status(401).json({ error: "token_not_found" });
+export const authorize = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  
+  const token = authHeader && authHeader.startsWith('Bearer ') 
+    ? authHeader.split(' ')[1] 
+    : null;
+
+  if (!token) {
+    return res.status(401).json({ error: "token_not_found" });
+  }
 
   try {
-    const verified = jwt.verify(token, config.JWT_SECRET);
+    const verified = jwt.verify(token, config.ACCESS_TOKEN_SECRET) as UserPayload;
+    
     req.user = verified;
+    
     next();
-  } catch (err) {
-    res.status(403).json({ error: "invalid_or_expired_token" });
+  } catch (err: any) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: "token_expired" });
+    }
+
+    res.status(403).json({ error: "invalid_token" });
   }
 };

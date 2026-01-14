@@ -14,4 +14,4 @@ app.get('/api/me', authorize, async (req: any, res) => {
   res.json({ message: "logged as:", user });
 });
 
-app.listen(config.PORT, () => console.log(''));
+app.listen(config.PORT, () => console.log(`Running on: ${config.PORT}`));

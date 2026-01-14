@@ -7,8 +7,19 @@ generator client {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  role      String   @default("USER")
-  lastLogin DateTime @default(now())
+  id            Int            @id @default(autoincrement())
+  username      String         @unique
+  role          String         @default("USER")
+  lastLogin     DateTime       @default(now())
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  hashedToken String @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
