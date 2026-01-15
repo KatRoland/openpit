@@ -1,6 +1,7 @@
 import express from 'express';
 import authRoutes from './routers/authRouter.js';
 import monitorRoutes from './routers/monitorRouter.js';
+import dockerRoutes from './routers/dockerRourer.js';
 import { createServer } from 'http';
 import { initSocket } from './utils/socket.js';
 import { authorize } from './middleware/auth.js';
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/monitor', monitorRoutes);
+app.use('/api/docker', dockerRoutes);
 
 app.get('/api/me', authorize, async (req: any, res) => {
   const user = await prisma.user.findUnique({ where: { id: req.user.id } });

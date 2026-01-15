@@ -1,5 +1,5 @@
 import { config } from '../utils/config.js';
-import { getMemoryStats, getCPULoad } from '../utils/sysusage.js';
+import { getMemoryStats, getCPULoad } from '../utils/systemhelper.js';
 
 export const getSystemStats = (req: any, res: any) => {
     const memoryStats = getMemoryStats();
