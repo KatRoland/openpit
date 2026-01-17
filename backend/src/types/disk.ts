@@ -10,3 +10,11 @@ export interface BlockDevice {
     children?: BlockDevice[];
 }
 
+export interface DiskUsageInfo {
+    filesystem: string;
+    size: string;
+    used: string;
+    avail: string;
+    usePercent: string;
+    mountedOn?: string;
+}
