@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 import { Server as HTTPServer } from 'http';
-import { systemStats } from './systemhelper.js';
+import { systemStats } from './systemHelper.js';
 import { config } from './config.js';
 import jwt from 'jsonwebtoken';
 
