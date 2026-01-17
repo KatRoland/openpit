@@ -30,3 +30,46 @@ const execAsync = promisify(exec);
             throw new Error("could_not_fetch_disk_usage");
         }
     }
+
+        export async function getDiskUsageByDisk (diskName: string): Promise<DiskUsageInfo | null> {
+        try {
+            const blocks = await execAsync(`lsblk -bJ -o NAME,SIZE,FSUSED /dev/${diskName}`);
+            const parsed = JSON.parse(blocks.stdout);
+            const blockDevices = parsed.blockdevices as Array<{ name: string; size: string; fsused?: string }>;
+            const disk = blockDevices.find(device => device.name === diskName);
+
+
+            if (!disk) {
+                return null;
+            }
+
+            const sizeBytes = parseInt(disk.size, 10);
+            const usedBytes = getUsedBytes (parsed.blockdevices[0].children);
+            const availBytes = sizeBytes - usedBytes;
+            const usePercent = sizeBytes > 0 ? ((usedBytes / sizeBytes) * 100).toFixed(1) + '%' : '0%';
+
+            const usage: DiskUsageInfo = {
+                filesystem: `/dev/${disk.name}`,
+                size: (sizeBytes / (1024 ** 3)).toFixed(2) + 'G',
+                used: (usedBytes / (1024 ** 3)).toFixed(2) + 'G',
+                avail: (availBytes / (1024 ** 3)).toFixed(2) + 'G',
+                usePercent,
+            };
+            return usage || null;
+        } catch (error) {
+            throw new Error("could_not_fetch_disk_usage_by_disk");
+        }
+    }
+
+    function getUsedBytes(children: BlockDevice[]): number {
+        if(children.find(child => child.children && child.children.length > 0)) {
+            return children.reduce((total, child) => {
+                const childUsage = child.children ? getUsedBytes(child.children) : 0;
+                return total + childUsage;
+            },0);
+        }
+        return children.reduce((total, child) => {
+            const fsused = child.fsused ? child.fsused : 0;
+            return total + fsused;
+        },0);
+    }
