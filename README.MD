@@ -43,8 +43,9 @@ Az **OpenPit** egy nyílt forráskódú, web-alapú adminisztrációs felület, 
 
 | Funkció | Állapot | Prioritás |
 | :--- | :--- | :--- |
-| Alap monitorozás (CPU/RAM) | 📅 Tervezve | Magas |
-| Docker Container kezelés | 📅 Tervezve | Magas |
+| Alap monitorozás (CPU/RAM) | 🚧 Folyamatban | Magas |
+| Fáljrendszer kezelés       | 🚧 Folyamatban | Magas |
+| Docker Container kezelés | 📅 Elkezdve(szüneteltetve) | Magas |
 | Samba Config Manager | 📅 Tervezve | Magas |
 | Hálozatkezelés       | 📅 Tervezve | Magas |
 | Felhasználói jogosultságkezelés | 📅 Tervezve | Közepes |
