@@ -73,3 +73,33 @@ const execAsync = promisify(exec);
             return total + fsused;
         },0);
     }
+
+    export async function initDisk(disk: string): Promise<{ statusCode: number; message: string }> {
+        const { stdout } = await execAsync(`lsblk /dev/${disk}`);
+        if (!stdout.includes(disk)) {
+            throw new Error("disk_not_found");
+        }
+
+        try {
+        const ismounted = stdout.split('\n').some(line => line.includes('/dev/' + disk) && line.includes('mnt'));
+        if (ismounted) {
+            await execAsync(`sudo -n umount /dev/${disk}1`);
+            await execAsync(`sudo -n parted /dev/${disk} rm 1 --script`);
+        }
+        try {
+        await execAsync(`sudo -n parted /dev/${disk} mklabel gpt --script`);
+        } catch (error) {
+            await execAsync(`sudo -n umount /dev/${disk}1`);
+            await execAsync(`sudo -n parted /dev/${disk} rm 1 --script`);
+        }
+        await execAsync(`sudo -n parted -a optimal /dev/${disk} mkpart primary ext4 0% 100% --script`);
+        console.log("Partition created");
+        await execAsync(`sudo -n mkfs.ext4 /dev/${disk}1`);
+        await execAsync(`sudo -n mkdir -p /mnt/${disk}`);
+        await execAsync(`sudo -n mount /dev/${disk}1 /mnt/${disk}`);
+        } catch (error) {
+            console.error("Disk initialization error:", error);
+            throw new Error("disk_initialization_failed");
+        }
+        return { statusCode: 200, message: "utilizitation_sucessfull" };
+    }   
