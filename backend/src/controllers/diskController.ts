@@ -1,5 +1,5 @@
 import { config } from '../utils/config.js';
-import { getDiskList, getDiskUsage, getDiskUsageByDisk, initDisk } from '../utils/diskHelper.js';
+import { getDiskList, getDiskUsage, getDiskUsageByDisk, initDisk, diskStatus } from '../utils/diskHelper.js';
 
 export const getAllDisk = async (req: any, res: any) => {
     const disks = await getDiskList();
@@ -49,6 +49,24 @@ export const initDiskController = async (req: any, res: any) => {
             return res.status(404).json({ error: "disk_not_found" });
         } else if (error.message === "disk_initialization_failed") {
             return res.status(500).json({ error: "disk_initialization_failed" });
+        } else {
+            return res.status(500).json({ error: "internal_server_error" });
+        }
+    }
+}
+
+export const getDiskStatus = async (req: any, res: any) => {
+    const { diskName } = req.params;
+    try {
+        if (!diskName) {
+            return res.status(400).json({ error: "disk_name_required" });
+        }
+
+        const childrens = await diskStatus(diskName);
+        res.status(200).json({ childrens });
+    } catch (error: any) {
+        if (error.message === "disk_not_found") {
+            return res.status(404).json({ error: "disk_not_found" });
         } else {
             return res.status(500).json({ error: "internal_server_error" });
         }

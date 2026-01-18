@@ -18,3 +18,9 @@ export interface DiskUsageInfo {
     usePercent: string;
     mountedOn?: string;
 }
+
+export interface ChildrenStatus {
+    name: string;
+    fileSystem: string | null;
+    status: string;
+}

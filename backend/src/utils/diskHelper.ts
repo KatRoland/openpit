@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { BlockDevice, DiskUsageInfo } from '../types/disk.js';
+import { BlockDevice, DiskUsageInfo, ChildrenStatus } from '../types/disk.js';
 
 const execAsync = promisify(exec);
 
@@ -102,4 +102,24 @@ const execAsync = promisify(exec);
             throw new Error("disk_initialization_failed");
         }
         return { statusCode: 200, message: "utilizitation_sucessfull" };
-    }   
+    } 
+
+    export async function diskStatus(disk: string): Promise<ChildrenStatus[]> {
+        const { stdout } = await execAsync(`lsblk /dev/${disk} -J -o NAME,FSTYPE,SIZE`);
+        if (!stdout.includes(disk)) {
+            throw new Error("disk_not_found");
+        }
+        const parsed = JSON.parse(stdout);
+        console.log(parsed);
+        if(parsed.blockdevices[0].children.length === 0) {
+            return [{ name: disk, status: "unmounted", fileSystem: "unknown" }];
+        }
+        const childrens = [] as ChildrenStatus[];
+        for (const child of parsed.blockdevices[0].children) {
+            const name = child.name;
+            const ismounted = child.mountpoint !== null;
+            const fileSystem = child.fstype || "unknown";
+            childrens.push({ name, status: ismounted ? "mounted" : "unmounted", fileSystem });
+        }
+        return childrens;
+    }
