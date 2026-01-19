@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllDisk, getDiskUsages, getDiskUsageForDisk, initDiskController, getDiskStatus, getMountableFileSystems } from '../controllers/diskController.js';
+import { getAllDisk, getDiskUsages, getDiskUsageForDisk, initDiskController, getDiskStatus, getMountableFileSystems, handleMountFileSystem } from '../controllers/diskController.js';
 import { authorize } from '../middleware/auth.js';
 
 const router = Router();
@@ -15,5 +15,7 @@ router.get('/mountables', authorize, getMountableFileSystems);
 
 
 router.post('/init', authorize, initDiskController);
+
+router.put('/mount', authorize, handleMountFileSystem);
 
 export default router;

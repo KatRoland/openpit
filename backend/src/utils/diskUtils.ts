@@ -141,3 +141,39 @@ const execAsync = promisify(exec);
         }
         return mountables;
     }
+
+    export async function mountFileSystem(fileSystem: string): Promise<{ statusCode: number; message: string }> {
+        const devicePath = `/dev/${fileSystem}`;
+        const partitionPath = `${devicePath}`;
+        const mountPoint = `/mnt/${fileSystem}`;
+
+        if (!await isFsExists(fileSystem)) {
+            throw new Error("device_not_found");
+        }
+
+        if( await isFsMounted(fileSystem)) {
+            throw new Error("already_mounted");
+        }
+
+        try {
+            const { stdout: uuidRaw } = await execAsync(`sudo -n blkid -s UUID -o value ${partitionPath}`);
+            const uuid = uuidRaw.trim();
+
+            if (!uuid) {
+                throw new Error("not_a_valid_filesystem");
+            }
+
+            const fstabEntry = `UUID=${uuid} ${mountPoint} ext4 defaults,nofail 0 2`;
+            await execSudo(`sed -i '\\|${mountPoint}|d' /etc/fstab`);
+            await execSudo(`bash -c 'echo "${fstabEntry}" >> /etc/fstab'`);
+            await execSudo(`mkdir -p ${mountPoint}`);
+            await execSudo(`mount -a`);
+
+            return { statusCode: 200, message: "mount_successful" };
+
+        } catch (error) {
+            console.error(`Failed to mount and persist ${fileSystem}:`, error);
+            throw new Error("mount_faiiled");
+        }
+    }
+
