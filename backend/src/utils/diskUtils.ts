@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { BlockDevice, DiskUsageInfo, ChildrenStatus } from '../types/disk.js';
+import { getUsedBytes, mountableFileSystemsHelper, isFsMounted, isFsExists } from '../helpers/diskHelper.js';
 
 const execAsync = promisify(exec);
 
@@ -61,37 +62,16 @@ const execAsync = promisify(exec);
         }
     }
 
-    function getUsedBytes(children: BlockDevice[]): number {
-        if(children.find(child => child.children && child.children.length > 0)) {
-            return children.reduce((total, child) => {
-                const childUsage = child.children ? getUsedBytes(child.children) : 0;
-                return total + childUsage;
-            },0);
-        }
-        return children.reduce((total, child) => {
-            const fsused = child.fsused ? child.fsused : 0;
-            return total + fsused;
-        },0);
-    }
-
     export async function initDisk(disk: string): Promise<{ statusCode: number; message: string }> {
-        const { stdout } = await execAsync(`lsblk /dev/${disk}`);
-        if (!stdout.includes(disk)) {
+        if (!await isFsExists(disk)) {
             throw new Error("disk_not_found");
         }
-
         try {
-        const ismounted = stdout.split('\n').some(line => line.includes('/dev/' + disk) && line.includes('mnt'));
-        if (ismounted) {
+        if (await isFsMounted(disk)) {
             await execAsync(`sudo -n umount /dev/${disk}1`);
             await execAsync(`sudo -n parted /dev/${disk} rm 1 --script`);
         }
-        try {
         await execAsync(`sudo -n parted /dev/${disk} mklabel gpt --script`);
-        } catch (error) {
-            await execAsync(`sudo -n umount /dev/${disk}1`);
-            await execAsync(`sudo -n parted /dev/${disk} rm 1 --script`);
-        }
         await execAsync(`sudo -n parted -a optimal /dev/${disk} mkpart primary ext4 0% 100% --script`);
         console.log("Partition created");
         await execAsync(`sudo -n mkfs.ext4 /dev/${disk}1`);
@@ -101,14 +81,16 @@ const execAsync = promisify(exec);
             console.error("Disk initialization error:", error);
             throw new Error("disk_initialization_failed");
         }
-        return { statusCode: 200, message: "utilizitation_sucessfull" };
+        return { statusCode: 200, message: "initialization_successful" };
     } 
 
     export async function diskStatus(disk: string): Promise<ChildrenStatus[]> {
-        const { stdout } = await execAsync(`lsblk /dev/${disk} -J -o NAME,FSTYPE,SIZE`);
-        if (!stdout.includes(disk)) {
+        
+        if(!await isFsExists(disk)) {
             throw new Error("disk_not_found");
         }
+        
+        const { stdout } = await execAsync(`lsblk -J -o NAME,FSTYPE,MOUNTPOINT /dev/${disk}`);
         const parsed = JSON.parse(stdout);
         console.log(parsed);
         if(parsed.blockdevices[0].children.length === 0) {
@@ -122,4 +104,20 @@ const execAsync = promisify(exec);
             childrens.push({ name, status: ismounted ? "mounted" : "unmounted", fileSystem });
         }
         return childrens;
+    }
+
+    export async function mountableFileSystems(): Promise<BlockDevice[]> {
+        const allDisks = await getDiskList();
+        const mountables = [];
+        for (const disk of allDisks) {
+            if(disk.children && disk.children.length > 0) {
+                for (const child of disk.children) {
+                    mountables.push(...await mountableFileSystemsHelper(child));
+                }
+            }
+            if (!disk.mountpoint && disk.fstype !== null) {
+                mountables.push(disk);
+            }
+        }
+        return mountables;
     }

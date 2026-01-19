@@ -1,5 +1,5 @@
 import { config } from '../utils/config.js';
-import { getDiskList, getDiskUsage, getDiskUsageByDisk, initDisk, diskStatus } from '../utils/diskHelper.js';
+import { getDiskList, getDiskUsage, getDiskUsageByDisk, initDisk, diskStatus, mountableFileSystems } from '../utils/diskUtils.js';
 
 export const getAllDisk = async (req: any, res: any) => {
     const disks = await getDiskList();
@@ -72,3 +72,13 @@ export const getDiskStatus = async (req: any, res: any) => {
         }
     }
 }
+
+export const getMountableFileSystems = async (req: any, res: any) => {
+    try {
+        const mountables = await mountableFileSystems();
+        res.status(200).json({ mountables });
+    } catch (error: any) {
+        return res.status(500).json({ error: "internal_server_error" });
+    }
+}
+

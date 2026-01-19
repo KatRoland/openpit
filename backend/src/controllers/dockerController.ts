@@ -1,5 +1,5 @@
 
-import { listContainers, testFn,toggleContainer  } from '../utils/dockerHelper.js';
+import { listContainers, testFn,toggleContainer  } from '../utils/dockerUtils.js';
 import { Request, Response } from 'express';
 
 export const getAllContainers = async (req: Request,res: Response) => {

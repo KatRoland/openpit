@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { config } from './config.js';
+import { config } from '../utils/config.js';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
