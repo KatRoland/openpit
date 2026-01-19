@@ -49,7 +49,10 @@ export const initDiskController = async (req: any, res: any) => {
             return res.status(404).json({ error: "disk_not_found" });
         } else if (error.message === "disk_initialization_failed") {
             return res.status(500).json({ error: "disk_initialization_failed" });
-        } else {
+        } else if (error.message === "unmount_first") {
+            return res.status(400).json({ error: "unmount_first" });
+        }
+         else {
             return res.status(500).json({ error: "internal_server_error" });
         }
     }

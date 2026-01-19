@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { execSudo } from '../helpers/execHelper.js';
 import { BlockDevice, DiskUsageInfo, ChildrenStatus } from '../types/disk.js';
 import { getUsedBytes, mountableFileSystemsHelper, isFsMounted, isFsExists } from '../helpers/diskHelper.js';
 
@@ -63,33 +64,52 @@ const execAsync = promisify(exec);
     }
 
     export async function initDisk(disk: string): Promise<{ statusCode: number; message: string }> {
+        const devicePath = `/dev/${disk}`;
+        const partitionPath = `${devicePath}1`; 
+        const mountPoint = `/mnt/${disk}`;
+
         if (!await isFsExists(disk)) {
             throw new Error("disk_not_found");
         }
-        try {
-        if (await isFsMounted(disk)) {
-            await execAsync(`sudo -n umount /dev/${disk}1`);
-            await execAsync(`sudo -n parted /dev/${disk} rm 1 --script`);
+
+        if (await isFsMounted(`${disk}1`)) {
+            throw new Error("unmount_first");
         }
-        await execAsync(`sudo -n parted /dev/${disk} mklabel gpt --script`);
-        await execAsync(`sudo -n parted -a optimal /dev/${disk} mkpart primary ext4 0% 100% --script`);
-        console.log("Partition created");
-        await execAsync(`sudo -n mkfs.ext4 /dev/${disk}1`);
-        await execAsync(`sudo -n mkdir -p /mnt/${disk}`);
-        await execAsync(`sudo -n mount /dev/${disk}1 /mnt/${disk}`);
+
+        try {
+            await execSudo(`parted ${devicePath} mklabel gpt --script`);
+
+            await execSudo(`parted -a optimal ${devicePath} mkpart primary ext4 0% 100% --script`);
+            
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for partition to be recognized -- DONT REMOVE --
+
+            await execSudo(`mkfs.ext4 ${partitionPath}`);
+
+            const { stdout: uuidRaw } = await execAsync(`sudo -n blkid -s UUID -o value ${partitionPath}`);
+            const uuid = uuidRaw.trim();
+            if (!uuid) throw new Error("uuid_generation_failed");
+
+            const fstabEntry = `UUID=${uuid} ${mountPoint} ext4 defaults,nofail 0 2`;
+            await execSudo(`sed -i '\\|${mountPoint}|d' /etc/fstab`);
+            await execSudo(`bash -c 'echo "${fstabEntry}" >> /etc/fstab'`);
+
+            await execSudo(`mkdir -p ${mountPoint}`);
+            await execSudo(`mount -a`);
+
+            return { statusCode: 200, message: "initialization_successful" };
+
         } catch (error) {
-            console.error("Disk initialization error:", error);
+            console.error(`Disk initialization failed:`, error);
             throw new Error("disk_initialization_failed");
         }
-        return { statusCode: 200, message: "initialization_successful" };
-    } 
+    }
 
     export async function diskStatus(disk: string): Promise<ChildrenStatus[]> {
         
         if(!await isFsExists(disk)) {
             throw new Error("disk_not_found");
         }
-        
+
         const { stdout } = await execAsync(`lsblk -J -o NAME,FSTYPE,MOUNTPOINT /dev/${disk}`);
         const parsed = JSON.parse(stdout);
         console.log(parsed);
