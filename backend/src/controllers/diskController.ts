@@ -1,5 +1,5 @@
 import { config } from '../utils/config.js';
-import { getDiskList, getDiskUsage, getDiskUsageByDisk, initDisk, diskStatus, mountableFileSystems, mountFileSystem } from '../utils/diskUtils.js';
+import { getDiskList, getDiskUsage, getDiskUsageByDisk, initDisk, diskStatus, mountableFileSystems, mountFileSystem, unmountFileSystem } from '../utils/diskUtils.js';
 
 export const getAllDisk = async (req: any, res: any) => {
     const disks = await getDiskList();
@@ -103,6 +103,29 @@ export const handleMountFileSystem = async (req: any, res: any) => {
             return res.status(500).json({ error: "mount_faiiled" });
         } else if( error.message === "already_mounted") {
             return res.status(400).json({ error: "already_mounted" });
+        }
+        else {
+            return res.status(500).json({ error: "internal_server_error" });
+        }
+    }
+}
+
+export const handleUnmountFileSystem = async (req: any, res: any) => {
+    const { fileSystem } = req.body;
+    try {
+        if (!fileSystem) {
+            return res.status(400).json({ error: "filesystem_required" });
+        }
+
+        const result = await unmountFileSystem(fileSystem);
+        res.status(result.statusCode).json({ message: result.message });
+    } catch (error: any) {
+        if (error.message === "device_not_found") {
+            return res.status(404).json({ error: "device_not_found" });
+        } else if (error.message === "unmount_failed") {
+            return res.status(500).json({ error: "unmount_failed" });
+        } else if( error.message === "not_mounted") {
+            return res.status(400).json({ error: "not_mounted" });
         }
         else {
             return res.status(500).json({ error: "internal_server_error" });

@@ -66,7 +66,7 @@ const execAsync = promisify(exec);
     export async function initDisk(disk: string): Promise<{ statusCode: number; message: string }> {
         const devicePath = `/dev/${disk}`;
         const partitionPath = `${devicePath}1`; 
-        const mountPoint = `/mnt/${disk}`;
+        const mountPoint = `/mnt/${disk}1`;
 
         if (!await isFsExists(disk)) {
             throw new Error("disk_not_found");
@@ -174,6 +174,34 @@ const execAsync = promisify(exec);
         } catch (error) {
             console.error(`Failed to mount and persist ${fileSystem}:`, error);
             throw new Error("mount_faiiled");
+        }
+    }
+
+        export async function unmountFileSystem(fileSystem: string): Promise<{ statusCode: number; message: string }> {
+        const mountPoint = `/mnt/${fileSystem}`;
+
+        try {
+            if(!await isFsMounted(`${fileSystem}`)) {
+                throw new Error("not_mounted");
+            }
+
+            await execSudo(`umount ${mountPoint}`);
+
+            await execSudo(`sed -i '\\|${mountPoint}|d' /etc/fstab`);
+
+            await execSudo(`rmdir ${mountPoint}`);
+
+            return { statusCode: 200, message: "unmount_successful" };
+
+        } catch (error: any) {
+            if (error.message?.includes("target is busy")) {
+                throw new Error("disk_busy");
+            } else if( error.message === "not_mounted") {
+                throw new Error("not_mounted");
+            }
+            
+            console.error(`Failed to unmount`, error);
+            throw new Error("unmount_failed");
         }
     }
 
