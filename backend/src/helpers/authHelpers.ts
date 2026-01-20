@@ -34,3 +34,26 @@ export const generateTokens = (userId: number, username: string) => {
 export const hashToken = (token: string) => {
   return crypto.createHash('sha256').update(token).digest('hex');
 };
+
+// unused yet, but may be useful later
+export const verifyActionToken = async (actionToken: string, username: string, action: string, target: string | null) => {
+  try {
+    const payload = jwt.verify(actionToken, config.ACTION_TOKEN_SECRET) as any;
+
+    if (payload.username !== username) {
+      return false;
+    }
+
+    if (payload.action !== action) {
+      return false;
+    }
+
+    if (target && payload.target !== target) {
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    return false;
+  }
+}

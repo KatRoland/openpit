@@ -86,3 +86,22 @@ export const logout = async (req: any, res: any) => {
     res.status(200).json({ success: true });
   }
 };
+
+export const requestActionToken = async (req: any, res: any) => {
+  const { username, password, action, target } = req.body;
+
+  try {
+    await authenticateSystemUser(username, password);
+
+    const actionToken = jwt.sign(
+      { username, action, ...(target && { target }) },
+      config.ACTION_TOKEN_SECRET,
+      { expiresIn: '1m' }
+    );
+
+    res.json({ actionToken });
+  } catch (error: any) {
+    res.status(401).json({ error: error.message });
+  }
+};
+

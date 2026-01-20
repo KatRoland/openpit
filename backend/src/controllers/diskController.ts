@@ -134,13 +134,13 @@ export const handleUnmountFileSystem = async (req: any, res: any) => {
 }
 
 export const handleFormatFileSystem = async (req: any, res: any) => {
-    const { fileSystem } = req.body;
+    const { target } = req.body;
     try {
-        if (!fileSystem) {
+        if (!target) {
             return res.status(400).json({ error: "filesystem_required" });
         }
 
-        const result = await formatFileSystem(fileSystem);
+        const result = await formatFileSystem(target);
         res.status(result.statusCode).json({ message: result.message });
     } catch (error: any) {
         if (error.message === "device_not_found") {

@@ -224,12 +224,15 @@ const execAsync = promisify(exec);
 
         var isMounted = await isFsMounted(fileSystem);
         if (isMounted) {
-            await unmountFileSystem(fileSystem);
+            throw new Error("unmount_first");            
         }
         try {
             await execSudo(`mkfs.ext4 ${partitionPath}`);
             return { statusCode: 200, message: "format_successful" };
-        } catch (error) {
+        } catch (error: any) {
+            if(error.message?.includes("already mounted")) {
+                throw new Error("unmount_first");
+                }
             console.error(`Failed to format`, error);
             throw new Error("format_failed");
         }
