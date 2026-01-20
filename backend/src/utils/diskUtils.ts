@@ -181,6 +181,15 @@ const execAsync = promisify(exec);
         const mountPoint = `/mnt/${fileSystem}`;
 
         try {
+            if (!await isFsExists(fileSystem)) {
+                throw new Error("device_not_found");
+            }
+        } catch (error) {
+            throw new Error("device_not_found");
+        }
+
+
+        try {
             if(!await isFsMounted(`${fileSystem}`)) {
                 throw new Error("not_mounted");
             }
