@@ -1,5 +1,7 @@
 # OpenPit
 
+### **DISCLAIMER**: Jelenleg a projekt még nem nyújt out-of-the-box élményt, a futtatásához kisebb rendszerszintű módosításokra van szükség.
+
 **Linux Infrastructure Management Panel**
 
 Az **OpenPit** egy nyílt forráskódú, web-alapú adminisztrációs felület, amely modern és átlátható megoldást nyújt Linux rendszerek távoli kezeléséhez. A projekt célja, hogy egy központi, stabil "műveleti központot" biztosítson, ahol a rendszergazdák egyetlen felületen láthatják és módosíthatják a rendszer kritikus paramétereit, a legegyszerűbb módon!
@@ -50,6 +52,7 @@ Az **OpenPit** egy nyílt forráskódú, web-alapú adminisztrációs felület, 
 | Hálozatkezelés       | 📅 Tervezve | Magas |
 | Felhasználói jogosultságkezelés | 📅 Tervezve | Közepes |
 | Fájlrendszer böngésző | 📅 Tervezve | Alacsony |
+| Cluster Kezelés | ❔ Ötlet |  Alacsony |
 
 ---
 
