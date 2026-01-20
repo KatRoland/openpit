@@ -214,3 +214,23 @@ const execAsync = promisify(exec);
         }
     }
 
+    export async function formatFileSystem(fileSystem: string): Promise<{ statusCode: number; message: string }> {
+        const devicePath = `/dev/${fileSystem}`;
+        const partitionPath = `${devicePath}`;
+
+        if (!await isFsExists(fileSystem)) {
+            throw new Error("device_not_found");
+        }
+
+        var isMounted = await isFsMounted(fileSystem);
+        if (isMounted) {
+            await unmountFileSystem(fileSystem);
+        }
+        try {
+            await execSudo(`mkfs.ext4 ${partitionPath}`);
+            return { statusCode: 200, message: "format_successful" };
+        } catch (error) {
+            console.error(`Failed to format`, error);
+            throw new Error("format_failed");
+        }
+    }

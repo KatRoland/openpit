@@ -1,5 +1,5 @@
 import { config } from '../utils/config.js';
-import { getDiskList, getDiskUsage, getDiskUsageByDisk, initDisk, diskStatus, mountableFileSystems, mountFileSystem, unmountFileSystem } from '../utils/diskUtils.js';
+import { getDiskList, getDiskUsage, getDiskUsageByDisk, initDisk, diskStatus, mountableFileSystems, mountFileSystem, unmountFileSystem, formatFileSystem } from '../utils/diskUtils.js';
 
 export const getAllDisk = async (req: any, res: any) => {
     const disks = await getDiskList();
@@ -133,3 +133,22 @@ export const handleUnmountFileSystem = async (req: any, res: any) => {
     }
 }
 
+export const handleFormatFileSystem = async (req: any, res: any) => {
+    const { fileSystem } = req.body;
+    try {
+        if (!fileSystem) {
+            return res.status(400).json({ error: "filesystem_required" });
+        }
+
+        const result = await formatFileSystem(fileSystem);
+        res.status(result.statusCode).json({ message: result.message });
+    } catch (error: any) {
+        if (error.message === "device_not_found") {
+            return res.status(404).json({ error: "device_not_found" });
+        } else if (error.message === "format_failed") {
+            return res.status(500).json({ error: "format_failed" });
+        } else {
+            return res.status(500).json({ error: "internal_server_error" });
+        }
+    }
+}
