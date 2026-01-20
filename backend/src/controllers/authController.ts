@@ -1,6 +1,10 @@
 import { prisma } from '../utils/db.js';
 import jwt from 'jsonwebtoken';
-import { authenticateSystemUser, generateTokens, hashToken } from '../helpers/authHelpers.js';
+import { 
+  authenticateSystemUser, 
+  generateTokens, 
+  hashToken 
+} from '../helpers/authHelpers.js';
 import { config } from '../utils/config.js';
 
 export const login = async (req: any, res: any) => {

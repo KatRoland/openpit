@@ -1,14 +1,10 @@
 import { Router } from 'express';
-import { getAllDisk,
+import { 
+    getAllDisk,
     getDiskUsages,
     getDiskUsageForDisk,
     initDiskController,
-    getDiskStatus, 
-    getMountableFileSystems, 
-    handleMountFileSystem, 
-    handleUnmountFileSystem, 
-    handleFormatFileSystem, 
-    handleDeleteFileSystem 
+    getDiskStatus
 } from '../controllers/diskController.js';
 import { authorize } from '../middleware/auth.js';
 import { verifyActionToken } from '../middleware/action.js';
@@ -22,13 +18,5 @@ router.get('/status', authorize, (req, res) => {
     res.status(400).json({ error: "disk_name_required" });
 });
 router.get('/status/:diskName', authorize, getDiskStatus);
-router.get('/mountables', authorize, getMountableFileSystems);
-
-
-router.post('/init', authorize, initDiskController);
-router.post('/mount', authorize, handleMountFileSystem);
-router.post('/unmount', authorize, handleUnmountFileSystem);
-router.post('/format', authorize, verifyActionToken, handleFormatFileSystem);
-router.delete('/delete', authorize, verifyActionToken, handleDeleteFileSystem);
 
 export default router;
