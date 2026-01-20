@@ -63,7 +63,7 @@ const execAsync = promisify(exec);
         }
     }
 
-    export async function initDisk(disk: string): Promise<{ statusCode: number; message: string }> {
+    export async function initDisk(disk: string, username: string): Promise<{ statusCode: number; message: string }> {
         const devicePath = `/dev/${disk}`;
         const partitionPath = `${devicePath}1`; 
         const mountPoint = `/mnt/${disk}1`;
@@ -95,6 +95,7 @@ const execAsync = promisify(exec);
 
             await execSudo(`mkdir -p ${mountPoint}`);
             await execSudo(`mount -a`);
+            await execSudo(`chown -R ${username}:${username} ${mountPoint}`);
 
             return { statusCode: 200, message: "initialization_successful" };
 

@@ -42,7 +42,7 @@ export const initDiskController = async (req: any, res: any) => {
             return res.status(400).json({ error: "disk_name_required" });
         }
 
-        const result = await initDisk(diskName);
+        const result = await initDisk(diskName, req.user.username);
         res.status(result.statusCode).json({ message: result.message });
     } catch (error: any) {
         if (error.message === "disk_not_found") {
