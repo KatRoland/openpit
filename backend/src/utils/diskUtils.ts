@@ -238,3 +238,30 @@ const execAsync = promisify(exec);
             throw new Error("format_failed");
         }
     }
+
+    export async function deleteFileSystem(disk: string, partition: number): Promise<{ statusCode: number; message: string }> {
+        const fileSystem = `${disk}${partition}`;
+        const mountPoint = `/mnt/${fileSystem}`;
+
+        if (!await isFsExists(fileSystem)) {
+            throw new Error("device_not_found");
+        }
+
+        var isMounted = await isFsMounted(fileSystem);
+        if (isMounted) {
+            throw new Error("unmount_first");
+        }
+
+        try {
+            await execSudo(`sed -i '\\|${mountPoint}|d' /etc/fstab`);
+            await execSudo(`mount -a`);
+            await execSudo(`parted /dev/${disk} rm ${partition} --script`);
+            return { statusCode: 200, message: "deletion_successful" };
+        } catch (error: any) {
+            if(error.message?.includes("already mounted")) {
+                throw new Error("unmount_first");
+                }
+            console.error(`Failed to delete filesystem`, error);
+            throw new Error("deletion_failed");
+        }
+    }

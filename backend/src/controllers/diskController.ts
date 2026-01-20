@@ -1,5 +1,5 @@
 import { config } from '../utils/config.js';
-import { getDiskList, getDiskUsage, getDiskUsageByDisk, initDisk, diskStatus, mountableFileSystems, mountFileSystem, unmountFileSystem, formatFileSystem } from '../utils/diskUtils.js';
+import { getDiskList, getDiskUsage, getDiskUsageByDisk, initDisk, diskStatus, mountableFileSystems, mountFileSystem, unmountFileSystem, formatFileSystem, deleteFileSystem } from '../utils/diskUtils.js';
 
 export const getAllDisk = async (req: any, res: any) => {
     const disks = await getDiskList();
@@ -148,6 +148,33 @@ export const handleFormatFileSystem = async (req: any, res: any) => {
         } else if (error.message === "format_failed") {
             return res.status(500).json({ error: "format_failed" });
         } else {
+            return res.status(500).json({ error: "internal_server_error" });
+        }
+    }
+}
+
+export const handleDeleteFileSystem = async (req: any, res: any) => {
+    const { target, disk, partition } = req.body;
+    try {
+        if (!target) {
+            return res.status(400).json({ error: "filesystem_required" });
+        }
+
+        if(target != `${disk}${partition}`) {
+            return res.status(400).json({ error: "invalid_target" });
+        }
+
+        const result = await deleteFileSystem(disk, partition);
+        res.status(result.statusCode).json({ message: result.message });
+    } catch (error: any) {
+        if (error.message === "device_not_found") {
+            return res.status(404).json({ error: "device_not_found" });
+        } else if (error.message === "deletion_failed") {
+            return res.status(500).json({ error: "deletion_failed" });
+        } else if( error.message === "unmount_first") {
+            return res.status(400).json({ error: "unmount_first" });
+        }
+        else {
             return res.status(500).json({ error: "internal_server_error" });
         }
     }
