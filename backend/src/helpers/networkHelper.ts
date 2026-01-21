@@ -23,3 +23,15 @@ export async function getDefaultGateway(interfaceName: string): Promise<string> 
         throw new Error("could_not_fetch_default_gateway");
     }
 }
+
+export async function getDNSServers(interfaceName: string): Promise<string[]> {
+    try {
+        const { stdout } = await execAsync(`resolvectl status ${interfaceName} | awk '/DNS Servers:/ {for(i=3;i<=NF;i++) print $i}' | jq -R . | jq -s '{interface: "${interfaceName}", dns_servers: .}'`);
+        const parsed = JSON.parse(stdout);
+        const dnsServers: string[] = parsed.dns_servers || [];
+        return dnsServers;
+    } catch (error) {
+        console.error(`Error fetching DNS servers for ${interfaceName}:`, error);
+        throw new Error("could_not_fetch_dns_servers");
+    }
+}
