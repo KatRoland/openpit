@@ -13,3 +13,13 @@ export async function getDHCPStatus(interfaceName: string): Promise<boolean> {
     }
 }
 
+export async function getDefaultGateway(interfaceName: string): Promise<string> {
+    try {
+        const { stdout } = await execAsync(`ip -j route show dev ${interfaceName} | jq -r '.[] | select(.dst == "default") | .gateway'`);
+        const gateway = stdout.trim();
+        return gateway || '';
+    } catch (error) {
+        console.error(`Error fetching default gateway for ${interfaceName}:`, error);
+        throw new Error("could_not_fetch_default_gateway");
+    }
+}
