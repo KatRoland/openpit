@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec npx tsx src/index.ts"
+    "dev": "nodemon --exec npx tsx src/index.ts",
+    "test:unit": "vitest -c vitest.unit.config.ts",
+    "test:int": "vitest -c vitest.integration.config.ts",
+    "test": "npm run test:unit -- --run && npm run test:int -- --run"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +36,9 @@
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^6.0.4",
+    "vitest": "^4.0.17",
+    "vitest-mock-extended": "^3.1.0"
   }
 }

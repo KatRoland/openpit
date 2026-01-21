@@ -11,7 +11,8 @@
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*", "src/types/*"],
-      "prisma/config": ["./node_modules/prisma/dist/config"]
+      "prisma/config": ["./node_modules/prisma/dist/config"],
+      "@/*": ["src/*"]
     },
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
