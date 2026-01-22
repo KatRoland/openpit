@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import { execSudo } from '../helpers/execHelper.js';
 import { networkInterfaces } from 'os';
 import { NetworkInterface, NetworkConfig, NetworkConfigIPv6, NetworkStatus } from 'network.js';
-import { getDHCPStatus, getDefaultGateway, getDNSServers, getNICLINKSpeed } from '@/helpers/networkHelper.js';
+import { getDHCPStatus, getDefaultGateway, getDNSServers, getNICLINKSpeed, getNICLINKState } from '@/helpers/networkHelper.js';
 
 const execAsync = promisify(exec);
 
@@ -46,7 +46,7 @@ export async function getAllNIC(): Promise<NetworkInterface[]> {
                         dnsServers: []
                     },
                     networkStatus: {
-                        status: 'up',
+                        status: await getNICLINKState(name),
                         speedMbps: await getNICLINKSpeed(name)
                     }
                 });

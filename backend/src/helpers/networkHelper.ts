@@ -47,3 +47,19 @@ export async function getNICLINKSpeed(interfaceName: string): Promise<number> {
         throw new Error("could_not_fetch_link_speed");
     }
 }
+
+export async function getNICLINKState(interfaceName: string): Promise<"up" | "down">  {
+    try {
+     const { stdout } = await execAsync(`cat /sys/class/net/${interfaceName}/operstate`);
+     const trimmed = stdout.trim();
+     console.log('Link state output:', trimmed)
+     if(trimmed == "up" || trimmed == "down") {
+         return trimmed;
+     } else {
+        return "down"
+     }
+    } catch (error) {
+        console.error(`Error fetching link state for ${interfaceName}:`, error);
+        throw new Error("could_not_fetch_link_state");
+    }
+}
