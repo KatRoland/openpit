@@ -41,7 +41,7 @@ export async function getNICLINKSpeed(interfaceName: string): Promise<number> {
      const { stdout } = await execAsync(`cat /sys/class/net/${interfaceName}/speed`);
      const splitOutput = stdout.trim().split(': ')
      console.log('Link speed output:', splitOutput)
-        return parseInt(splitOutput[1]);
+        return parseInt(splitOutput[0]);
     } catch (error) {
         console.error(`Error fetching link speed for ${interfaceName}:`, error);
         throw new Error("could_not_fetch_link_speed");
