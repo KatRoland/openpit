@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import { execSudo } from '../helpers/execHelper.js';
 import { networkInterfaces } from 'os';
 import { NetworkInterface, NetworkConfig, NetworkConfigIPv6, NetworkStatus } from 'network.js';
-import { getDHCPStatus, getDefaultGateway, getDNSServers, getNICLINKSpeed, getNICLINKState, getCIDR } from '@/helpers/networkHelper.js';
+import { getDHCPStatus, getDefaultGateway, getDNSServers, getNICLINKSpeed, getNICLINKState, getCIDR, validateIPAddress } from '@/helpers/networkHelper.js';
 import { promises as fs } from 'fs';
 
 const execAsync = promisify(exec);
@@ -72,6 +72,10 @@ export async function applyNetworkConfig(config: NetworkInterface): Promise<void
     const ip = config.ipAddress;
     const gateway = config.networkConfig.gateway;
     const isDhcp = config.networkConfig.dhcpEnabled;
+
+    if(!isDhcp && !validateIPAddress(ip)) {
+        throw new Error("invalid_ip_address");
+    }
 
     try {
         await execSudo(`dhclient -r ${iface} || true`);
