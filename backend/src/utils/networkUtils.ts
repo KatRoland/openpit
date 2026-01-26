@@ -67,6 +67,16 @@ export async function getAllNIC(): Promise<NetworkInterface[]> {
     return nicList;
 }
 
+export async function getNICByName(name: string): Promise<NetworkInterface | null> {
+    const nicList: NetworkInterface[] = await getAllNIC();
+    for (const nic of nicList) {
+        if (nic.name === name) {
+            return nic;
+        }
+    }
+    return null;
+}
+
 export async function applyNetworkConfig(config: NetworkInterface): Promise<void> {
     const iface = config.name;
     const ip = config.ipAddress;
