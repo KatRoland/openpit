@@ -48,7 +48,7 @@ Az **OpenPit** egy nyílt forráskódú, web-alapú adminisztrációs felület, 
 | Funkció | Állapot | Prioritás |
 | :--- | :--- | :--- |
 | Alap monitorozás (CPU/RAM) | 🚧 Folyamatban | Magas |
-| Fáljrendszer kezelés       | 🚧 Folyamatban | Magas |
+| Fáljrendszer kezelés       | ☑️ Kész | Magas |
 | Docker Container kezelés | 📅 Elkezdve(szüneteltetve) | Magas |
 | Samba Config Manager | 📅 Tervezve | Magas |
 | Alapvető IPV4 kezelés       | ☑️ Kész | Magas |
@@ -124,7 +124,7 @@ Mert a hobbi rendszergazdák számára is teljesen kezelhetővé és átláthat�
 | Feature | Status | Priority |
 | :--- | :--- | :--- |
 | Basic Monitoring (CPU/RAM) | 🚧 In Progress | High |
-| Filesystem Management | 🚧 In Progress | High |
+| Filesystem Management | ☑️ Done | High |
 | Docker Container Management | 📅 Started (Paused) | High |
 | Samba Config Manager | 📅 Planned | High |
 | Basic IPV4 management | ☑️ Done | High |
