@@ -16,8 +16,8 @@ export const handleApplyNetworkConfig = async (req: any, res: any) => {
     const config = req.body as NetworkInterface;
     try {
         await applyNetworkConfig(config);
-        res.status(200).json({ message: "Network configuration applied successfully." });
+        res.status(200).json({ message: "network_configuration_apply_success" });
     } catch (error) {
-        res.status(500).json({ error: "Failed to apply network configuration." });
+        res.status(500).json({ error: "failed_to_apply_network_config" });
     }
 }
