@@ -51,7 +51,9 @@ Az **OpenPit** egy nyílt forráskódú, web-alapú adminisztrációs felület, 
 | Fáljrendszer kezelés       | 🚧 Folyamatban | Magas |
 | Docker Container kezelés | 📅 Elkezdve(szüneteltetve) | Magas |
 | Samba Config Manager | 📅 Tervezve | Magas |
-| Hálozatkezelés       | 📅 Tervezve | Magas |
+| Alapvető IPV4 kezelés       | ☑️ Kész | Magas |
+| Mélyebb IPV4 kezelés (vlan,bridge, stb)       | 📅 Tervezve | Alacsony |
+| Alapvető IPV6 kezelés       | 📅 Tervezve | Alacsony |
 | Felhasználói jogosultságkezelés | 📅 Tervezve | Közepes |
 | Fájlrendszer böngésző | 📅 Tervezve | Alacsony |
 | Cluster Kezelés | ❔ Ötlet |  Alacsony |
@@ -125,7 +127,9 @@ Mert a hobbi rendszergazdák számára is teljesen kezelhetővé és átláthat�
 | Filesystem Management | 🚧 In Progress | High |
 | Docker Container Management | 📅 Started (Paused) | High |
 | Samba Config Manager | 📅 Planned | High |
-| Network Management | 📅 Planned | High |
+| Basic IPV4 management | ☑️ Done | High |
+| Advanced IPV4 management (vlan,bridge) | ☑️ Done | Low |
+| Basic IPV6 management | 📅 Planned | Low |
 | User Permission Management | 📅 Planned | Medium |
 | Filesystem Browser | 📅 Planned | Low |
 | Cluster Management | ❔ Idea | Low |
