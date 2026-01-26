@@ -16,10 +16,11 @@ export interface NetworkConfigIPv6 {
 export interface NetworkInterface {
   name: string;
   ipAddress: string;
+  cidr: number;
   macAddress: string;
   netmask: string;
   networkConfig: NetworkConfig;
-  networkConfigIPv6: NetworkConfigIPv6;
+  networkConfigIPv6: NetworkConfigIPv6 | null;
   networkStatus: NetworkStatus;
 }
 

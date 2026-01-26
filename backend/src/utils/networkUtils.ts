@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import { execSudo } from '../helpers/execHelper.js';
 import { networkInterfaces } from 'os';
 import { NetworkInterface, NetworkConfig, NetworkConfigIPv6, NetworkStatus } from 'network.js';
-import { getDHCPStatus, getDefaultGateway, getDNSServers, getNICLINKSpeed, getNICLINKState } from '@/helpers/networkHelper.js';
+import { getDHCPStatus, getDefaultGateway, getDNSServers, getNICLINKSpeed, getNICLINKState, getCIDR } from '@/helpers/networkHelper.js';
 import { promises as fs } from 'fs';
 
 const execAsync = promisify(exec);
@@ -43,6 +43,7 @@ export async function getAllNIC(): Promise<NetworkInterface[]> {
             ipAddress: ipv4 ? ipv4.address : '',
             macAddress: macAddress,
             netmask: ipv4 ? ipv4.netmask : '',
+            cidr: ipv4 ? getCIDR(ipv4.address) : 0,
             networkConfig: {
                 dhcpEnabled: await getDHCPStatus(name),
                 gateway: await getDefaultGateway(name),
@@ -64,4 +65,34 @@ export async function getAllNIC(): Promise<NetworkInterface[]> {
     }
 
     return nicList;
+}
+
+export async function applyNetworkConfig(config: NetworkInterface): Promise<void> {
+    const iface = config.name;
+    const ip = config.ipAddress;
+    const gateway = config.networkConfig.gateway;
+    const isDhcp = config.networkConfig.dhcpEnabled;
+
+    try {
+        await execSudo(`dhclient -r ${iface} || true`);
+        
+        await execSudo(`ip addr flush dev ${iface}`);
+
+        if (isDhcp) {
+            await execSudo(`dhclient ${iface}`);
+        } else {
+            const cidr = getCIDR(ip);
+            
+            await execSudo(`ip addr add ${ip}/${cidr} dev ${iface}`);
+            
+            await execSudo(`ip link set ${iface} up`);
+            
+            if (gateway) {
+                await execSudo(`ip route add default via ${gateway} dev ${iface}`);
+            }
+        }
+    } catch (error) {
+        console.error(`Failed to apply network config via ip/dhclient:`, error);
+        throw new Error("network_apply_failed");
+    }
 }
