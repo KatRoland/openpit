@@ -4,7 +4,8 @@ import {
     getDiskUsages,
     getDiskUsageForDisk,
     initDiskController,
-    getDiskStatus
+    getDiskStatus,
+    getDiskIOStatistics
 } from '../controllers/diskController.js';
 import { authorize } from '../middleware/auth.js';
 import { verifyActionToken } from '../middleware/action.js';
@@ -18,5 +19,6 @@ router.get('/status', authorize, (req, res) => {
     res.status(400).json({ error: "disk_name_required" });
 });
 router.get('/status/:diskName', authorize, getDiskStatus);
+router.get('/io/:diskName', authorize, getDiskIOStatistics);
 
 export default router;

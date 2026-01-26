@@ -127,4 +127,42 @@ const execAsync = promisify(exec);
         return childrens;
     }
 
-    
+    async function getALLDiskIOStats(): Promise<any[]> {
+        try {
+            const { stdout } = await execAsync(`iostat -dk -o JSON 1 1`);
+            const data = JSON.parse(stdout);
+            const diskStats = data.sysstat.hosts[0].statistics[0].disk;
+
+            const filtered = diskStats.map((d: any) => ({
+                device: d.disk_device,
+                read_kB_s: d['kB_read/s'],
+                write_kB_s: d['kB_wrtn/s'],
+            }));
+            return filtered;
+        }
+            catch (error) {
+            console.error(`Error fetching all disk I/O stats:`, error);
+            throw new Error("could_not_fetch_all_disk_io_stats");
+        }
+    }
+
+    export async function getDiskIOStats(disk: string): Promise<{ readBytes: number; writeBytes: number }> {
+        try {
+            const allStats = await getALLDiskIOStats();
+
+            const targetDisk = allStats.find((d: any) => d.device === disk);
+
+            if (!targetDisk) {
+                throw new Error("disk_not_found");
+            }
+
+            return {
+                readBytes: targetDisk.read_kB_s * 1024,
+                writeBytes: targetDisk.write_kB_s * 1024,
+            };
+
+        } catch (error) {
+            console.error(`Error fetching disk I/O stats for ${disk}:`, error);
+            throw new Error("could_not_fetch_disk_io_stats");
+        }
+    }

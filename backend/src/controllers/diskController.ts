@@ -4,7 +4,8 @@ import {
     getDiskUsage, 
     getDiskUsageByDisk, 
     initDisk, 
-    diskStatus 
+    diskStatus,
+    getDiskIOStats
 } from '../utils/diskUtils.js';
 
 export const getAllDisk = async (req: any, res: any) => {
@@ -82,3 +83,21 @@ export const getDiskStatus = async (req: any, res: any) => {
     }
 }
 
+
+export const getDiskIOStatistics = async (req: any, res: any) => {
+    const { diskName } = req.params;
+    try {
+        if (!diskName) {
+            return res.status(400).json({ error: "disk_name_required" });
+        }
+
+        const ioStats = await getDiskIOStats(diskName);
+        res.status(200).json({ ioStats });
+    } catch (error: any) {
+        if (error.message === "disk_not_found") {
+            return res.status(404).json({ error: "disk_not_found" });
+        } else {
+            return res.status(500).json({ error: "internal_server_error" });
+        }
+    }
+}
