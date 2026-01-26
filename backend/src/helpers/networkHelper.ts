@@ -63,3 +63,40 @@ export async function getNICLINKState(interfaceName: string): Promise<"up" | "do
         throw new Error("could_not_fetch_link_state");
     }
 }
+
+export function getCIDR(ip: string): number{
+    const firstOctet = parseInt(ip.split('.')[0]);
+
+    if (isNaN(firstOctet)) throw new Error("invalid_ip_address");
+
+    if (firstOctet >= 1 && firstOctet <= 126) {
+        return 8; 
+    } 
+    else if (firstOctet >= 128 && firstOctet <= 191) {
+        return 16;
+    } 
+    else if (firstOctet >= 192 && firstOctet <= 223) {
+        return 24;
+    } 
+    else if (firstOctet >= 224) {
+        return 32;
+    } 
+    else {
+        throw new Error("ip_address_out_of_range");
+    }
+}
+
+export function getNetmask(prefix: number): string {
+    if (prefix < 0 || prefix > 32) {
+        throw new Error("invalid_prefix_length");
+    }
+
+    let mask = (0xFFFFFFFF << (32 - prefix)) >>> 0;
+
+    return [
+        (mask >>> 24) & 0xFF,
+        (mask >>> 16) & 0xFF,
+        (mask >>> 8) & 0xFF,
+        mask & 0xFF
+    ].join('.');
+}
