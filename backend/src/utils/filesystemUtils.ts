@@ -49,6 +49,8 @@ const execAsync = promisify(exec);
             await execSudo(`bash -c 'echo "${fstabEntry}" >> /etc/fstab'`);
             await execSudo(`mkdir -p ${mountPoint}`);
             await execSudo(`mount -a`);
+            await execSudo(`chown -R nobody:nogroup ${mountPoint}`);
+            await execSudo('chmod -R 777 ' + mountPoint);
 
             return { statusCode: 200, message: "mount_successful" };
 

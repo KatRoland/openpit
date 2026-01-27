@@ -5,6 +5,7 @@ import dockerRoutes from './routers/dockerRourer.js';
 import diskRouter from './routers/diskRouter.js';
 import fsRouter from './routers/filesystemRouter.js';
 import networkRouter from './routers/networkRouter.js';
+import sambaRouter from './routers/sambeRouter.js';
 import { createServer } from 'http';
 import { initSocket } from './utils/socket.js';
 import { authorize } from './middleware/auth.js';
@@ -22,6 +23,7 @@ app.use('/api/docker', dockerRoutes);
 app.use('/api/disk', diskRouter);
 app.use('/api/filesystem', fsRouter);
 app.use('/api/network', networkRouter);
+app.use('/api/samba', sambaRouter);
 
 app.get('/api/me', authorize, async (req: any, res) => {
   const user = await prisma.user.findUnique({ where: { id: req.user.id } });
