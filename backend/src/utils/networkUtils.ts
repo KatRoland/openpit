@@ -5,6 +5,7 @@ import { networkInterfaces } from 'os';
 import { NetworkInterface, NetworkConfig, NetworkConfigIPv6, NetworkStatus } from 'network.js';
 import { getDHCPStatus, getDefaultGateway, getDNSServers, getNICLINKSpeed, getNICLINKState, getCIDR, validateIPAddress } from '@/helpers/networkHelper.js';
 import { promises as fs } from 'fs';
+import { sanitizeIPAddress, sanitizeString } from '@/helpers/stringHelper.js';
 
 const execAsync = promisify(exec);
 
@@ -79,30 +80,33 @@ export async function getNICByName(name: string): Promise<NetworkInterface | nul
 
 export async function applyNetworkConfig(config: NetworkInterface): Promise<void> {
     const iface = config.name;
+    const sanitizedIface = sanitizeString(iface);
     const ip = config.ipAddress;
+    const sanitizedIp = sanitizeIPAddress(ip);
     const gateway = config.networkConfig.gateway;
+    const sanitizedGateway = sanitizeIPAddress(gateway);
     const isDhcp = config.networkConfig.dhcpEnabled;
 
-    if(!isDhcp && !validateIPAddress(ip)) {
+    if(!isDhcp && !validateIPAddress(sanitizedIp)) {
         throw new Error("invalid_ip_address");
     }
 
     try {
-        await execSudo(`dhclient -r ${iface} || true`);
+        await execSudo(`dhclient -r ${sanitizedIface} || true`);
         
-        await execSudo(`ip addr flush dev ${iface}`);
+        await execSudo(`ip addr flush dev ${sanitizedIface}`);
 
         if (isDhcp) {
-            await execSudo(`dhclient ${iface}`);
+            await execSudo(`dhclient ${sanitizedIface}`);
         } else {
-            const cidr = getCIDR(ip);
+            const cidr = getCIDR(sanitizedIp);
             
-            await execSudo(`ip addr add ${ip}/${cidr} dev ${iface}`);
+            await execSudo(`ip addr add ${sanitizedIp}/${cidr} dev ${sanitizedIface}`);
             
-            await execSudo(`ip link set ${iface} up`);
+            await execSudo(`ip link set ${sanitizedIface} up`);
             
-            if (gateway) {
-                await execSudo(`ip route add default via ${gateway} dev ${iface}`);
+            if (sanitizedGateway) {
+                await execSudo(`ip route add default via ${sanitizedGateway} dev ${sanitizedIface}`);
             }
         }
     } catch (error) {

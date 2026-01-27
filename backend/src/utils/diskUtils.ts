@@ -3,6 +3,7 @@ import { promisify } from 'util';
 import { execSudo } from '../helpers/execHelper.js';
 import { BlockDevice, DiskUsageInfo, ChildrenStatus } from '../types/disk.js';
 import { getUsedBytes, mountableFileSystemsHelper, isFsMounted, isFsExists } from '../helpers/diskHelper.js';
+import { sanitizeString } from '@/helpers/stringHelper.js';
 
 const execAsync = promisify(exec);
 
@@ -35,7 +36,8 @@ const execAsync = promisify(exec);
 
         export async function getDiskUsageByDisk (diskName: string): Promise<DiskUsageInfo | null> {
         try {
-            const blocks = await execAsync(`lsblk -bJ -o NAME,SIZE,FSUSED /dev/${diskName}`);
+            const sanitizedName = sanitizeString(diskName);
+            const blocks = await execAsync(`lsblk -bJ -o NAME,SIZE,FSUSED /dev/${sanitizedName}`);
             const parsed = JSON.parse(blocks.stdout);
             const blockDevices = parsed.blockdevices as Array<{ name: string; size: string; fsused?: string }>;
             const disk = blockDevices.find(device => device.name === diskName);
@@ -64,15 +66,16 @@ const execAsync = promisify(exec);
     }
 
     export async function initDisk(disk: string, username: string): Promise<{ statusCode: number; message: string }> {
-        const devicePath = `/dev/${disk}`;
+        const sanitizedDisk = sanitizeString(disk);
+        const devicePath = `/dev/${sanitizedDisk}`;
         const partitionPath = `${devicePath}1`; 
-        const mountPoint = `/mnt/${disk}1`;
+        const mountPoint = `/mnt/${sanitizedDisk}1`;
 
-        if (!await isFsExists(disk)) {
+        if (!await isFsExists(sanitizedDisk)) {
             throw new Error("disk_not_found");
         }
 
-        if (await isFsMounted(`${disk}1`)) {
+        if (await isFsMounted(`${sanitizedDisk}1`)) {
             throw new Error("unmount_first");
         }
 
@@ -95,7 +98,7 @@ const execAsync = promisify(exec);
 
             await execSudo(`mkdir -p ${mountPoint}`);
             await execSudo(`mount -a`);
-            await execSudo(`chown -R ${username}:${username} ${mountPoint}`);
+            await execSudo(`chown -R nobody:nogroup ${mountPoint}`);
 
             return { statusCode: 200, message: "initialization_successful" };
 
@@ -106,12 +109,13 @@ const execAsync = promisify(exec);
     }
 
     export async function diskStatus(disk: string): Promise<ChildrenStatus[]> {
-        
+        const sanitizedDisk = sanitizeString(disk);
+
         if(!await isFsExists(disk)) {
             throw new Error("disk_not_found");
         }
 
-        const { stdout } = await execAsync(`lsblk -J -o NAME,FSTYPE,MOUNTPOINT /dev/${disk}`);
+        const { stdout } = await execAsync(`lsblk -J -o NAME,FSTYPE,MOUNTPOINT /dev/${sanitizedDisk}`);
         const parsed = JSON.parse(stdout);
         console.log(parsed);
         if(parsed.blockdevices[0].children.length === 0) {

@@ -1,6 +1,7 @@
 import { config } from '../utils/config.js';
 import { 
-    shareFolder
+    shareFolder,
+    unshareFolder
 } from '../utils/sambaUtils.js';
 
 export const handleShareFolder = async (req: any, res: any) => {
@@ -21,6 +22,24 @@ export const handleShareFolder = async (req: any, res: any) => {
             return res.status(404).json({ error: "folder_not_found" });
         } else if (error.message === "samba_share_failed") {
             return res.status(500).json({ error: "samba_share_failed" });
+        }
+    }
+}
+
+export const handleUnShareFolder = async (req: any, res: any) => {
+    const { sharedName } = req.body;
+    try {
+        if (!sharedName) {
+            return res.status(400).json({ error: "shared_name_required" });
+        }
+
+        const result = await unshareFolder(sharedName);
+        res.status(result.statusCode).json({ message: result.message });
+    } catch (error: any) {
+        if (error.message === "folder_not_found") {
+            return res.status(404).json({ error: "folder_not_found" });
+        } else if (error.message === "unshare_failed") {
+            return res.status(500).json({ error: "unshare_failed" });
         }
     }
 }

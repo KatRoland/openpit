@@ -4,6 +4,7 @@ import { execSudo } from '../helpers/execHelper.js';
 import { BlockDevice, DiskUsageInfo, ChildrenStatus } from '../types/disk.js';
 import { getUsedBytes, mountableFileSystemsHelper, isFsMounted, isFsExists } from '../helpers/diskHelper.js';
 import { getDiskList } from './diskUtils.js';
+import { sanitizeString } from '@/helpers/stringHelper.js';
 
 const execAsync = promisify(exec);
 
@@ -24,15 +25,16 @@ const execAsync = promisify(exec);
     }
 
     export async function mountFileSystem(fileSystem: string): Promise<{ statusCode: number; message: string }> {
-        const devicePath = `/dev/${fileSystem}`;
+        const sanitizedFileSystem = sanitizeString(fileSystem);
+        const devicePath = `/dev/${sanitizedFileSystem}`;
         const partitionPath = `${devicePath}`;
-        const mountPoint = `/mnt/${fileSystem}`;
+        const mountPoint = `/mnt/${sanitizedFileSystem}`;
 
-        if (!await isFsExists(fileSystem)) {
+        if (!await isFsExists(sanitizedFileSystem)) {
             throw new Error("device_not_found");
         }
 
-        if( await isFsMounted(fileSystem)) {
+        if( await isFsMounted(sanitizedFileSystem)) {
             throw new Error("already_mounted");
         }
 
@@ -61,10 +63,11 @@ const execAsync = promisify(exec);
     }
 
         export async function unmountFileSystem(fileSystem: string): Promise<{ statusCode: number; message: string }> {
-        const mountPoint = `/mnt/${fileSystem}`;
+        const sanitizedFileSystem = sanitizeString(fileSystem);
+        const mountPoint = `/mnt/${sanitizedFileSystem}`;
 
         try {
-            if (!await isFsExists(fileSystem)) {
+            if (!await isFsExists(sanitizedFileSystem)) {
                 throw new Error("device_not_found");
             }
         } catch (error) {
@@ -73,7 +76,7 @@ const execAsync = promisify(exec);
 
 
         try {
-            if(!await isFsMounted(`${fileSystem}`)) {
+            if(!await isFsMounted(`${sanitizedFileSystem}`)) {
                 throw new Error("not_mounted");
             }
 
@@ -98,14 +101,15 @@ const execAsync = promisify(exec);
     }
 
     export async function formatFileSystem(fileSystem: string): Promise<{ statusCode: number; message: string }> {
-        const devicePath = `/dev/${fileSystem}`;
+        const sanitizedFileSystem = sanitizeString(fileSystem);
+        const devicePath = `/dev/${sanitizedFileSystem}`;
         const partitionPath = `${devicePath}`;
 
-        if (!await isFsExists(fileSystem)) {
+        if (!await isFsExists(sanitizedFileSystem)) {
             throw new Error("device_not_found");
         }
 
-        var isMounted = await isFsMounted(fileSystem);
+        var isMounted = await isFsMounted(sanitizedFileSystem);
         if (isMounted) {
             throw new Error("unmount_first");            
         }
@@ -122,7 +126,8 @@ const execAsync = promisify(exec);
     }
 
     export async function deleteFileSystem(disk: string, partition: number): Promise<{ statusCode: number; message: string }> {
-        const fileSystem = `${disk}${partition}`;
+        const sanitizedDisk = sanitizeString(disk);
+        const fileSystem = `${sanitizedDisk}${partition}`;
         const mountPoint = `/mnt/${fileSystem}`;
 
         if (!await isFsExists(fileSystem)) {
@@ -137,7 +142,7 @@ const execAsync = promisify(exec);
         try {
             await execSudo(`sed -i '\\|${mountPoint}|d' /etc/fstab`);
             await execSudo(`mount -a`);
-            await execSudo(`parted /dev/${disk} rm ${partition} --script`);
+            await execSudo(`parted /dev/${sanitizedDisk} rm ${partition} --script`);
             return { statusCode: 200, message: "deletion_successful" };
         } catch (error: any) {
             if(error.message?.includes("already mounted")) {
