@@ -45,18 +45,18 @@ Az **OpenPit** egy nyílt forráskódú, web-alapú adminisztrációs felület, 
 
 ## 🗺️ Útiterv (Roadmap)
 
-| Funkció | Állapot | Prioritás |
-| :--- | :--- | :--- |
-| Alap monitorozás (CPU/RAM) | 🚧 Folyamatban | Magas |
-| Fáljrendszer kezelés       | ☑️ Kész | Magas |
-| Docker Container kezelés | 📅 Elkezdve(szüneteltetve) | Magas |
-| Samba Config Manager | ☑️ Részben kész | Magas |
-| Alapvető IPV4 kezelés       | ☑️ Kész | Magas |
-| Mélyebb IPV4 kezelés (vlan,bridge, stb)       | 📅 Tervezve | Alacsony |
-| Alapvető IPV6 kezelés       | 📅 Tervezve | Alacsony |
-| Felhasználói jogosultságkezelés | 📅 Tervezve | Közepes |
-| Fájlrendszer böngésző | 📅 Tervezve | Alacsony |
-| Cluster Kezelés | ❔ Ötlet |  Alacsony |
+| Funkció | Állapot(Backend) | Állapot(Frontend) | Prioritás |
+| :--- | :--- | :--- | :--- |
+| Alap monitorozás (CPU/RAM) | 🚧 Folyamatban | 📅 Planned | Magas |
+| Fáljrendszer kezelés       | ☑️ Kész | 📅 Planned | Magas |
+| Docker Container kezelés | 📅 Elkezdve(szüneteltetve) | 📅 Planned | Magas |
+| Samba Config Manager | ☑️ Részben kész | 📅 Planned | Magas |
+| Alapvető IPV4 kezelés       | ☑️ Kész | 📅 Planned | Magas |
+| Mélyebb IPV4 kezelés (vlan,bridge, stb)       | 📅 Tervezve | 📅 Planned | Alacsony |
+| Alapvető IPV6 kezelés       | 📅 Tervezve | 📅 Planned | Alacsony |
+| Felhasználói jogosultságkezelés | 📅 Tervezve | 📅 Planned | Közepes |
+| Fájlrendszer böngésző | 📅 Tervezve | 📅 Planned | Alacsony |
+| Cluster Kezelés | ❔ Ötlet | ❔ Ötlet | Alacsony |
 
 ---
 
@@ -121,18 +121,18 @@ Mert a hobbi rendszergazdák számára is teljesen kezelhetővé és átláthat�
 
 ## 🗺️ Roadmap
 
-| Feature | Status | Priority |
-| :--- | :--- | :--- |
-| Basic Monitoring (CPU/RAM) | 🚧 In Progress | High |
-| Filesystem Management | ☑️ Done | High |
-| Docker Container Management | 📅 Started (Paused) | High |
-| Samba Config Manager | ☑️ Partially done | High |
-| Basic IPV4 management | ☑️ Done | High |
-| Advanced IPV4 management (vlan,bridge) | ☑️ Done | Low |
-| Basic IPV6 management | 📅 Planned | Low |
-| User Permission Management | 📅 Planned | Medium |
-| Filesystem Browser | 📅 Planned | Low |
-| Cluster Management | ❔ Idea | Low |
+| Feature | Status(Backend) | Status(Frontend) | Priority |
+| :--- | :--- | :--- | :--- |
+| Basic Monitoring (CPU/RAM) | 🚧 In Progress | 📅 Planned | High |
+| Filesystem Management | ☑️ Done | 📅 Planned | High |
+| Docker Container Management | 📅 Started (Paused) | 📅 Planned | High |
+| Samba Config Manager | ☑️ Partially done | 📅 Planned | High |
+| Basic IPV4 management | ☑️ Done | 📅 Planned | High |
+| Advanced IPV4 management (vlan,bridge) | ☑️ Done | 📅 Planned | Low |
+| Basic IPV6 management | 📅 Planned | 📅 Planned | Low |
+| User Permission Management | 📅 Planned | 📅 Planned | Medium |
+| Filesystem Browser | 📅 Planned | 📅 Planned | Low |
+| Cluster Management | ❔ Idea | ❔ Idea | Low |
 
 ---
 
