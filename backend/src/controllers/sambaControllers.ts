@@ -2,6 +2,7 @@ import { config } from '../utils/config.js';
 import { 
     shareFolder,
     unshareFolder,
+    createNewShare,
     listSharedFolders
 } from '../utils/sambaUtils.js';
 
@@ -41,6 +42,28 @@ export const handleUnShareFolder = async (req: any, res: any) => {
             return res.status(404).json({ error: "folder_not_found" });
         } else if (error.message === "unshare_failed") {
             return res.status(500).json({ error: "unshare_failed" });
+        }
+    }
+}
+
+export const handleCreateNewShare = async (req: any, res: any) => {
+    const { shareName, mountPoint } = req.body;
+    try {
+        if (!shareName) {
+            return res.status(400).json({ error: "share_name_required" });
+        }
+
+        if (!mountPoint) {
+            return res.status(400).json({ error: "mount_point_required" });
+        }
+
+        const result = await createNewShare(shareName, mountPoint);
+        res.status(result.statusCode).json({ message: result.message });
+    } catch (error: any) {
+        if (error.message === "mount_point_not_found") {
+            return res.status(404).json({ error: "mount_point_not_found" });
+        } else if (error.message === "samba_share_failed") {
+            return res.status(500).json({ error: "samba_share_failed" });
         }
     }
 }

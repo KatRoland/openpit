@@ -84,6 +84,27 @@ export async function unshareFolder(shareName: string): Promise< {statusCode: nu
 
 }
 
+export async function createNewShare(shareName: string, mountPoint: string): Promise<{statusCode: number, message: string}> {
+    if(!await isFolderExists(mountPoint)) {
+        throw new Error("mount_point_not_found");
+    }
+
+    if(!await isFolderExists(`${mountPoint}/shared`)) {
+        await execSudo(`mkdir -p ${mountPoint}/shared`);
+    }
+
+    try {
+        const result = await shareFolder(`${mountPoint}/shared`, shareName);
+        if(result.statusCode !== 200) {
+            throw new Error(result.message);
+        }
+        return { statusCode: 200, message: 'share_created_successfully' };
+    } catch (error) {
+        console.error("Failed to create new Samba share:", error);
+        throw error;
+    }
+}
+
 export async function listSharedFolders(): Promise< {name: string, path: string} []> {
     const registryFile = '/etc/samba/shares.conf';
     const shares: {name: string, path: string} []= [];
