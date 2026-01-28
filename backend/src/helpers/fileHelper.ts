@@ -11,3 +11,17 @@ export async function isFolderExists(folderPath: string): Promise<boolean> {
         return false;
     }
 }
+
+export async function folderContents(folderPath: string): Promise<{ name: string; type: string, path: string }[]> {
+  try {
+    const entries = await fs.readdir(folderPath, { withFileTypes: true });
+    return entries.map(entry => ({
+      name: entry.name,
+      type: entry.isDirectory() ? 'directory' : 'file',
+      path: folderPath + '/' + entry.name
+    }));
+  } catch (err) {
+    console.error("Error reading directory:", err);
+    return []; // Returning an empty array satisfies the return type
+  }
+}

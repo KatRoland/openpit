@@ -4,8 +4,10 @@ import {
     mountFileSystem, 
     unmountFileSystem, 
     formatFileSystem, 
-    deleteFileSystem 
+    deleteFileSystem
 } from '../utils/filesystemUtils.js';
+
+import { folderContents } from '@/helpers/fileHelper.js';
 
 export const getMountableFileSystems = async (req: any, res: any) => {
     try {
@@ -106,6 +108,27 @@ export const handleDeleteFileSystem = async (req: any, res: any) => {
             return res.status(400).json({ error: "unmount_first" });
         }
         else {
+            return res.status(500).json({ error: "internal_server_error" });
+        }
+    }
+}
+
+/** experimental function, will removed later when websocket is fully implemented */ 
+export const getFolderContents = async (req: any, res: any) => {
+    const { folderPath } = req.body;
+    try {
+        if (!folderPath) {
+            return res.status(400).json({ error: "folder_path_required" });
+        }
+
+        const contents = await folderContents(folderPath);
+        res.status(200).json({ contents });
+    } catch (error: any) {
+        if (error.message === "folder_not_found") {
+            return res.status(404).json({ error: "folder_not_found" });
+        } else if (error.message === "could_not_read_folder_contents") {
+            return res.status(500).json({ error: "could_not_read_folder_contents" });
+        } else {
             return res.status(500).json({ error: "internal_server_error" });
         }
     }

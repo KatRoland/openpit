@@ -4,7 +4,8 @@ import {
     handleMountFileSystem, 
     handleUnmountFileSystem, 
     handleFormatFileSystem, 
-    handleDeleteFileSystem 
+    handleDeleteFileSystem ,
+    getFolderContents
 } from '../controllers/filesystemController.js';
 import { authorize } from '../middleware/auth.js';
 import { verifyActionToken } from '../middleware/action.js';
@@ -13,6 +14,8 @@ const router = Router();
 
 
 router.get('/mountables', authorize, getMountableFileSystems);
+
+router.post('/contents', authorize, getFolderContents);
 
 router.post('/mount', authorize, handleMountFileSystem);
 router.post('/unmount', authorize, handleUnmountFileSystem);
