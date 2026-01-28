@@ -1,7 +1,8 @@
 import { config } from '../utils/config.js';
 import { 
     shareFolder,
-    unshareFolder
+    unshareFolder,
+    listSharedFolders
 } from '../utils/sambaUtils.js';
 
 export const handleShareFolder = async (req: any, res: any) => {
@@ -41,5 +42,14 @@ export const handleUnShareFolder = async (req: any, res: any) => {
         } else if (error.message === "unshare_failed") {
             return res.status(500).json({ error: "unshare_failed" });
         }
+    }
+}
+
+export const getSharedFolders = async (req: any, res: any) => {
+    try {
+        const sharedFolders = await listSharedFolders();
+        res.status(200).json({ sharedFolders });
+    } catch (error) {
+        res.status(500).json({ error: "could_not_fetch_shared_folders" });
     }
 }

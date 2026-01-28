@@ -5,6 +5,7 @@ import { BlockDevice, DiskUsageInfo, ChildrenStatus } from '../types/disk.js';
 import { isFolderExists } from '../helpers/fileHelper.js';
 import { initializeSambaGlobal } from '@/helpers/sambaHelper.js';
 import { sanitizeString } from '@/helpers/stringHelper.js';
+import { string } from 'zod/index.cjs';
 
 const execAsync = promisify(exec);
 
@@ -81,4 +82,40 @@ export async function unshareFolder(shareName: string): Promise< {statusCode: nu
         throw error;
     }
 
+}
+
+export async function listSharedFolders(): Promise< {name: string, path: string} []> {
+    const registryFile = '/etc/samba/shares.conf';
+    const shares: {name: string, path: string} []= [];
+
+    try {
+        const { stdout: currentRegistry } = await execAsync(`cat ${registryFile}`).catch(() => ({ stdout: '' }));
+        const lines = currentRegistry.split('\n');
+
+        let currentShare: {name: string, path: string} | null = null;
+
+        for (const line of lines) {
+            const shareMatch = line.match(/^\[(.+)\]$/);
+            if (shareMatch) {
+                if (currentShare) {
+                    shares.push(currentShare);
+                }
+                currentShare = { name: shareMatch[1], path: '' };
+            } else if (currentShare) {
+                const pathMatch = line.match(/^\s*path\s*=\s*(.+)$/);
+                if (pathMatch) {
+                    currentShare.path = pathMatch[1];
+                }
+            }
+        }
+
+        if (currentShare) {
+            shares.push(currentShare);
+        }
+
+        return shares;
+    } catch (error) {
+        console.error("Failed to list Samba shares:", error);
+        throw error;
+    }
 }
