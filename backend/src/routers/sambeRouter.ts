@@ -3,7 +3,8 @@ import {
     handleShareFolder,
     handleUnShareFolder,
     handleCreateNewShare,
-    getSharedFolders
+    getSharedFolders,
+    getSharedFoldersByPartition
 } from '../controllers/sambaControllers.js';
 import { authorize } from '../middleware/auth.js';
 import { verifyActionToken } from '../middleware/action.js';
@@ -11,6 +12,7 @@ import { verifyActionToken } from '../middleware/action.js';
 const router = Router();
 
 router.get('/list', authorize, getSharedFolders);
+router.get('/list/:partition', authorize, getSharedFoldersByPartition);
 
 router.post('/share', authorize, handleShareFolder);
 router.post('/unshare', authorize, handleUnShareFolder);

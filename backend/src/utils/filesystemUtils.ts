@@ -5,6 +5,8 @@ import { BlockDevice, DiskUsageInfo, ChildrenStatus } from '../types/disk.js';
 import { getUsedBytes, mountableFileSystemsHelper, isFsMounted, isFsExists } from '../helpers/diskHelper.js';
 import { getDiskList } from './diskUtils.js';
 import { sanitizeString } from '@/helpers/stringHelper.js';
+import { sharedFoldersByPartition } from '@/helpers/sambaHelper.js';
+import { unshareFolder } from './sambaUtils.js';
 
 const execAsync = promisify(exec);
 
@@ -78,6 +80,11 @@ const execAsync = promisify(exec);
         try {
             if(!await isFsMounted(`${sanitizedFileSystem}`)) {
                 throw new Error("not_mounted");
+            }
+
+            const sharedFolders = await sharedFoldersByPartition(`${sanitizedFileSystem}`);
+            for(const share of sharedFolders) {
+                await unshareFolder(share.name);
             }
 
             await execSudo(`umount ${mountPoint}`);

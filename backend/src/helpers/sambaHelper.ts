@@ -23,3 +23,29 @@ export async function initializeSambaGlobal(): Promise<void> {
         throw error;
     }
 }
+
+export async function sharedFoldersByPartition(partitionPath: string): Promise<{name: string, path: string}[]> {
+    const registryFile = '/etc/samba/shares.conf';
+    const shares: {name: string, path: string} []= [];
+
+    try {
+        const { stdout: currentRegistry } = await execAsync(`cat ${registryFile}`).catch(() => ({ stdout: '' }));
+        const shareBlocks = currentRegistry.split(/\n\s*\n/);
+
+        for (const block of shareBlocks) {
+            const nameMatch = block.match(/\[(.+?)\]/);
+            const pathMatch = block.match(/path\s*=\s*(.+)/);
+            if (nameMatch && pathMatch) {
+                const sharePath = pathMatch[1].trim();
+                if (sharePath.includes(partitionPath)) {
+                    shares.push({ name: nameMatch[1].trim(), path: sharePath });
+                }
+            }
+        }
+
+        return shares;
+    } catch (error) {
+        console.error("Failed to list Samba shares by partition:", error);
+        throw error;
+    }
+}

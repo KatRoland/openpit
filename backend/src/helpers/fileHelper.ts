@@ -22,6 +22,6 @@ export async function folderContents(folderPath: string): Promise<{ name: string
     }));
   } catch (err) {
     console.error("Error reading directory:", err);
-    return []; // Returning an empty array satisfies the return type
+    return [];
   }
 }

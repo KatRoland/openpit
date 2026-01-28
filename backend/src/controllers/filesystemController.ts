@@ -59,8 +59,11 @@ export const handleUnmountFileSystem = async (req: any, res: any) => {
             return res.status(500).json({ error: "unmount_failed" });
         } else if( error.message === "not_mounted") {
             return res.status(400).json({ error: "not_mounted" });
+        } else if( error.message === "disk_busy") {
+            return res.status(400).json({ error: "disk_busy" });
         }
         else {
+            console.error(error);
             return res.status(500).json({ error: "internal_server_error" });
         }
     }

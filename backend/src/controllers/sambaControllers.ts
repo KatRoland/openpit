@@ -6,6 +6,8 @@ import {
     listSharedFolders
 } from '../utils/sambaUtils.js';
 
+import { sharedFoldersByPartition } from '@/helpers/sambaHelper.js';
+
 export const handleShareFolder = async (req: any, res: any) => {
     const { folderPath, sharedName } = req.body;
     try {
@@ -74,5 +76,15 @@ export const getSharedFolders = async (req: any, res: any) => {
         res.status(200).json({ sharedFolders });
     } catch (error) {
         res.status(500).json({ error: "could_not_fetch_shared_folders" });
+    }
+}
+
+export const getSharedFoldersByPartition = async (req: any, res: any) => {
+    const { partition } = req.params;
+    try {
+        const shares = await sharedFoldersByPartition(partition);
+        res.status(200).json({ shares });
+    } catch (error) {
+        res.status(500).json({ error: "could_not_fetch_shared_folders_for_partition" });
     }
 }
