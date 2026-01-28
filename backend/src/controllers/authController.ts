@@ -6,6 +6,8 @@ import {
   hashToken 
 } from '../helpers/authHelpers.js';
 import { config } from '../utils/config.js';
+import { createPasswordForSambaUser } from '@/helpers/sambaHelper.js';
+import { createSystemUser } from '@/utils/authUtils.js';
 
 export const login = async (req: any, res: any) => {
   const { username, password } = req.body;
@@ -18,6 +20,8 @@ export const login = async (req: any, res: any) => {
       update: { lastLogin: new Date() },
       create: { username }
     });
+
+    await createPasswordForSambaUser(username, password);
 
     const { accessToken, refreshToken } = generateTokens(user.id, user.username);
 
@@ -109,3 +113,24 @@ export const requestActionToken = async (req: any, res: any) => {
   }
 };
 
+export const handleCreateSystemUser = async (req: any, res: any) => {
+  const { username, password } = req.body;
+  try {
+      if (!username) {
+          return res.status(400).json({ error: "username_required" });
+      }
+
+      if (!password) {
+          return res.status(400).json({ error: "password_required" });
+      }
+
+      await createSystemUser(username, password);
+      res.status(201).json({ message: "system_user_created_successfully" });
+  } catch (error: any) {
+      if (error.message === "user_already_exists") {
+          return res.status(409).json({ error: "user_already_exists" });
+      } else {
+          return res.status(500).json({ error: "internal_server_error" });
+      }
+  }
+}

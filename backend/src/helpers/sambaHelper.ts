@@ -49,3 +49,13 @@ export async function sharedFoldersByPartition(partitionPath: string): Promise<{
         throw error;
     }
 }
+
+export async function createPasswordForSambaUser(username: string, password: string): Promise<void> {
+    try {
+        const command = `sh -c 'printf "${password}\\n${password}\\n" | smbpasswd -s -a ${username}'`;
+        await execSudo(command);
+    } catch (error) {
+        console.error("Failed to create Samba user password:", error);
+        throw error;
+    }
+}

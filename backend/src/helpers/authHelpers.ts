@@ -2,6 +2,11 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { config } from '../utils/config.js';
 import { createRequire } from 'module';
+import { sanitizeString } from '@/helpers/stringHelper.js';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 const require = createRequire(import.meta.url);
 const pam = require('authenticate-pam');
@@ -56,4 +61,16 @@ export const verifyActionToken = async (actionToken: string, username: string, a
   } catch (err) {
     return false;
   }
+}
+
+export async function isSystemUserExists(username: string): Promise<boolean> {
+    const sanitizedUsername = sanitizeString(username);
+
+    try {
+        const { stdout } = await execAsync(`id -u ${sanitizedUsername}`).catch(() => ({ stdout: '' }));
+        return !!stdout;
+    } catch (error) {
+        console.error(`Error checking existence of user ${sanitizedUsername}:`, error);
+        return false;
+    }
 }
