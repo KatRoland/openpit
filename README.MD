@@ -50,7 +50,7 @@ Az **OpenPit** egy nyílt forráskódú, web-alapú adminisztrációs felület, 
 | Alap monitorozás (CPU/RAM) | 🚧 Folyamatban | Magas |
 | Fáljrendszer kezelés       | ☑️ Kész | Magas |
 | Docker Container kezelés | 📅 Elkezdve(szüneteltetve) | Magas |
-| Samba Config Manager | 📅 Tervezve | Magas |
+| Samba Config Manager | ☑️ Részben kész | Magas |
 | Alapvető IPV4 kezelés       | ☑️ Kész | Magas |
 | Mélyebb IPV4 kezelés (vlan,bridge, stb)       | 📅 Tervezve | Alacsony |
 | Alapvető IPV6 kezelés       | 📅 Tervezve | Alacsony |
@@ -126,7 +126,7 @@ Mert a hobbi rendszergazdák számára is teljesen kezelhetővé és átláthat�
 | Basic Monitoring (CPU/RAM) | 🚧 In Progress | High |
 | Filesystem Management | ☑️ Done | High |
 | Docker Container Management | 📅 Started (Paused) | High |
-| Samba Config Manager | 📅 Planned | High |
+| Samba Config Manager | ☑️ Partially done | High |
 | Basic IPV4 management | ☑️ Done | High |
 | Advanced IPV4 management (vlan,bridge) | ☑️ Done | Low |
 | Basic IPV6 management | 📅 Planned | Low |
