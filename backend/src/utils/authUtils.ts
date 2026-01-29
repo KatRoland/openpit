@@ -53,3 +53,20 @@ export async function changeUserGroups(username: string, groups: {groupsToAdd: s
         throw error;
     }   
 }
+
+export async function deleteSystemUser(username: string): Promise<void> {
+    const sanitizedUsername = sanitizeString(username);
+
+    try {
+        if (!await isSystemUserExists(sanitizedUsername)) {
+            throw new Error("user_does_not_exist");
+        }
+
+        await execSudo(`smbpasswd -x ${sanitizedUsername}`);
+        await execSudo(`userdel -r ${sanitizedUsername}`);
+
+    } catch (error) {
+        console.error(`Failed to delete Linux user ${sanitizedUsername}:`, error);
+        throw error;
+    }
+}

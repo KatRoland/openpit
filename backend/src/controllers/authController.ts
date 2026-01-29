@@ -7,7 +7,7 @@ import {
 } from '../helpers/authHelpers.js';
 import { config } from '../utils/config.js';
 import { createPasswordForSambaUser } from '@/helpers/sambaHelper.js';
-import { createSystemUser, changeUserGroups } from '@/utils/authUtils.js';
+import { createSystemUser, changeUserGroups, deleteSystemUser } from '@/utils/authUtils.js';
 
 export const login = async (req: any, res: any) => {
   const { username, password } = req.body;
@@ -151,5 +151,23 @@ export const handleChangeUserGroups = async (req: any, res: any) => {
     }
 
       return res.status(500).json({ error: "internal_server_error" });
+  }
+}
+
+export const handleDeleteSystemUser = async (req: any, res: any) => {
+  const { username } = req.body;
+  try {
+      if (!username) {
+          return res.status(400).json({ error: "username_required" });
+      }
+
+      await deleteSystemUser(username);
+      res.status(200).json({ message: "system_user_deleted_successfully" });
+  } catch (error: any) {
+      if (error.message === "user_does_not_exist") {
+          return res.status(404).json({ error: "user_does_not_exist" });
+      } else {
+          return res.status(500).json({ error: "internal_server_error" });
+      }
   }
 }
