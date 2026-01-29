@@ -28,3 +28,28 @@ export async function createSystemUser(username: string, password: string): Prom
     }
 }
 
+export async function changeUserGroups(username: string, groups: {groupsToAdd: string[], groupsToRemove: string[]}): Promise<void> {
+    const sanitizedUsername = sanitizeString(username);
+
+    if(!await isSystemUserExists(sanitizedUsername)) {
+        throw new Error("user_does_not_exist");
+    }
+
+    try {
+        if (groups.groupsToAdd.length > 0) {
+            const groupsToAddStr = groups.groupsToAdd.map(sanitizeString).join(',');
+            await execSudo(`usermod -aG ${groupsToAddStr} ${sanitizedUsername}`);
+        }
+
+        if (groups.groupsToRemove.length > 0) {
+            for (const group of groups.groupsToRemove) {
+                const sanitizedGroup = sanitizeString(group);
+                await execSudo(`gpasswd -d ${sanitizedUsername} ${sanitizedGroup}`);
+            }
+        }
+
+    } catch (error) {
+        console.error(`Failed to change groups for user ${sanitizedUsername}:`, error);
+        throw error;
+    }   
+}
