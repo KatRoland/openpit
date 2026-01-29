@@ -20,6 +20,7 @@ export async function createSystemUser(username: string, password: string): Prom
         console.log(`Creating user ${sanitizedUsername} with hashed password: ${hashedPassword}`);
         await execSudo(`useradd -m -s /bin/bash -p '${hashedPassword}' ${sanitizedUsername}`);
         await createPasswordForSambaUser(sanitizedUsername, password);
+        await execSudo(`usermod -aG users ${sanitizedUsername}`);
 
     } catch (error) {
         console.error(`Failed to create Linux user ${sanitizedUsername}:`, error);
