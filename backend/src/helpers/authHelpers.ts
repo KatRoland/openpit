@@ -20,6 +20,29 @@ export const authenticateSystemUser = (username: string, password: string): Prom
   });
 };
 
+export const authenticateSudoUser = async (username: string, password: string): Promise<void> => {
+  await new Promise<void>((resolve, reject) => {
+    pam.authenticate(username, password, (err: string | null) => {
+      if (err) return reject(new Error("authentication_failed"));
+      resolve();
+    });
+  });
+
+  try {
+    const { stdout } = await execAsync(`groups ${username}`);
+    const isSudoer = stdout.includes('sudo') || stdout.includes('wheel');
+
+    if (!isSudoer) {
+      throw new Error("user_not_in_sudo_group");
+    }
+  } catch (error) {
+    if(error instanceof Error && error.message === "user_not_in_sudo_group") {
+      throw error;
+    }
+    throw new Error("authorization_check_failed");
+  }
+};
+
 export const generateTokens = (userId: number, username: string) => {
   const accessToken = jwt.sign(
     { id: userId, username },

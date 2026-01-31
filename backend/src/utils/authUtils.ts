@@ -70,3 +70,22 @@ export async function deleteSystemUser(username: string): Promise<void> {
         throw error;
     }
 }
+
+export async function changeUserPassword(username: string, newPassword: string): Promise<void> {
+    const sanitizedUsername = sanitizeString(username);
+
+    try {
+        if (!await isSystemUserExists(sanitizedUsername)) {
+            throw new Error("user_does_not_exist");
+        }
+
+        const { stdout } = await execAsync(`openssl passwd -6 \"${newPassword}\"`);
+        const hashedPassword = stdout.trim();
+        await execSudo(`usermod -p '${hashedPassword}' ${sanitizedUsername}`);
+        await createPasswordForSambaUser(sanitizedUsername, newPassword);
+
+    } catch (error) {
+        console.error(`Failed to change password for user ${sanitizedUsername}:`, error);
+        throw error;
+    }
+}
