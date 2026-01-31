@@ -1,6 +1,7 @@
 import { prisma } from '../utils/db.js';
 import jwt from 'jsonwebtoken';
 import { 
+  authenticateSudoUser,
   authenticateSystemUser, 
   generateTokens, 
   hashToken 
@@ -99,7 +100,7 @@ export const requestActionToken = async (req: any, res: any) => {
   const { username, password, action, target } = req.body;
 
   try {
-    await authenticateSystemUser(username, password);
+    await authenticateSudoUser(username, password);
 
     const actionToken = jwt.sign(
       { username, action, ...(target && { target }) },
@@ -109,6 +110,7 @@ export const requestActionToken = async (req: any, res: any) => {
 
     res.json({ actionToken });
   } catch (error: any) {
+    console.error("Error requesting action token:", error);
     res.status(401).json({ error: error.message });
   }
 };
