@@ -7,7 +7,7 @@ import {
     handleDeleteFileSystem ,
     getFolderContents
 } from '../controllers/filesystemController.js';
-import { authorize } from '../middleware/auth.js';
+import { authorize, authorizeSudo } from '../middleware/auth.js';
 import { verifyActionToken } from '../middleware/action.js';
 
 const router = Router();
@@ -19,7 +19,7 @@ router.post('/contents', authorize, getFolderContents);
 
 router.post('/mount', authorize, handleMountFileSystem);
 router.post('/unmount', authorize, handleUnmountFileSystem);
-router.post('/format', authorize, verifyActionToken, handleFormatFileSystem);
-router.delete('/delete', authorize, verifyActionToken, handleDeleteFileSystem);
+router.post('/format', authorizeSudo, verifyActionToken, handleFormatFileSystem);
+router.delete('/delete', authorizeSudo, verifyActionToken, handleDeleteFileSystem);
 
 export default router;
