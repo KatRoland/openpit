@@ -147,9 +147,12 @@ export const handleChangeUserGroups = async (req: any, res: any) => {
       await changeUserGroups(username, groups);
       res.status(200).json({ message: "user_groups_updated_successfully" });
   } catch (error: any) {
-
     if(error.message === "user_does_not_exist") {
         return res.status(404).json({ error: "user_does_not_exist" });
+    } else if(error.message === "user_not_in_group") {
+        return res.status(400).json({ error: "user_not_in_group" });
+    } else if(error.message === "group_does_not_exist") {
+        return res.status(404).json({ error: "group_does_not_exist" });
     }
 
       return res.status(500).json({ error: "internal_server_error" });

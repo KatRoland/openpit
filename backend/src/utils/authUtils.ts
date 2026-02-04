@@ -48,9 +48,15 @@ export async function changeUserGroups(username: string, groups: {groupsToAdd: s
             }
         }
 
-    } catch (error) {
+    } catch (error: any) {
+        if(error.message.includes("is not a member of")) {
+            throw new Error("user_not_in_group");
+        } else if (error.message.includes("does not exist")) {
+            throw new Error("group_does_not_exist");
+        } else {
         console.error(`Failed to change groups for user ${sanitizedUsername}:`, error);
         throw error;
+        }
     }   
 }
 
