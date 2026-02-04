@@ -97,3 +97,16 @@ export async function isSystemUserExists(username: string): Promise<boolean> {
         return false;
     }
 }
+
+export async function isUserSuperUser(username: string): Promise<boolean> {
+    const sanitizedUsername = sanitizeString(username);
+
+    try {
+        const { stdout } = await execAsync(`groups ${sanitizedUsername}`);
+        return stdout.includes('sudo') || stdout.includes('wheel');
+    } catch (error) {
+        console.error(`Error checking sudo status of user ${sanitizedUsername}:`, error);
+        return false;
+    }
+}
+

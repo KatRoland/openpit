@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../utils/config.js';
+import { isUserSuperUser } from '@/helpers/authHelpers.js';
 
 interface UserPayload {
   id: number;
@@ -32,3 +33,35 @@ export const authorize = (req: Request, res: Response, next: NextFunction) => {
     res.status(403).json({ error: "invalid_token" });
   }
 };
+
+export const authorizeSudo = async (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  
+  const token = authHeader && authHeader.startsWith('Bearer ') 
+    ? authHeader.split(' ')[1] 
+    : null;
+
+  if (!token) {
+    return res.status(401).json({ error: "token_not_found" });
+  }
+
+  try {
+    const verified = jwt.verify(token, config.ACCESS_TOKEN_SECRET) as UserPayload;
+    
+    const isSudoUser = await isUserSuperUser(verified.username); // Replace with actual check
+
+    if (!isSudoUser) {
+      return res.status(403).json({ error: "insufficient_privileges" });
+    }
+
+    req.user = verified;
+    
+    next();
+  } catch (err: any) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: "token_expired" });
+    }
+
+    res.status(403).json({ error: "invalid_token" });
+  }
+}
