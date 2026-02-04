@@ -54,7 +54,7 @@ Az **OpenPit** egy nyílt forráskódú, web-alapú adminisztrációs felület, 
 | Alapvető IPV4 kezelés       | ☑️ Kész | 📅 Planned | Magas |
 | Mélyebb IPV4 kezelés (vlan,bridge, stb)       | 📅 Tervezve | 📅 Planned | Alacsony |
 | Alapvető IPV6 kezelés       | 📅 Tervezve | 📅 Planned | Alacsony |
-| Felhasználói jogosultságkezelés | 📅 Tervezve | 📅 Planned | Közepes |
+| Felhasználói jogosultságkezelés | ☑️ Kész | 📅 Planned | Közepes |
 | Fájlrendszer böngésző | 📅 Tervezve | 📅 Planned | Alacsony |
 | Cluster Kezelés | ❔ Ötlet | ❔ Ötlet | Alacsony |
 
@@ -130,7 +130,7 @@ Mert a hobbi rendszergazdák számára is teljesen kezelhetővé és átláthat�
 | Basic IPV4 management | ☑️ Done | 📅 Planned | High |
 | Advanced IPV4 management (vlan,bridge) | ☑️ Done | 📅 Planned | Low |
 | Basic IPV6 management | 📅 Planned | 📅 Planned | Low |
-| User Permission Management | 📅 Planned | 📅 Planned | Medium |
+| User Permission Management | ☑️ Done | 📅 Planned | Medium |
 | Filesystem Browser | 📅 Planned | 📅 Planned | Low |
 | Cluster Management | ❔ Idea | ❔ Idea | Low |
 

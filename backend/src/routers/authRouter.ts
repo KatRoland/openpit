@@ -12,6 +12,6 @@ router.post('/logout',authorize, logout);
 router.post('/actiontoken',authorize ,requestActionToken);
 router.post('/createsystemuser', authorizeSudo, verifyActionToken, handleCreateSystemUser);
 router.post('/changegroups', authorizeSudo, handleChangeUserGroups);
-router.post('/deletesystemuser', authorize, verifyActionToken, handleDeleteSystemUser);
+router.post('/deletesystemuser', authorizeSudo, verifyActionToken, handleDeleteSystemUser);
 
 export default router;
